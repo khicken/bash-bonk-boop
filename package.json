@@ -11,5 +11,9 @@
     "url": "\u001b[A\u001b[B"
   },
   "author": "Khicken",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "socket.io": "^3.0.0"
+  }
 }
