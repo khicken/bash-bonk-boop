@@ -1,10 +1,10 @@
 {
-  "name": "card-game",
+  "name": "bash-bonk-boop",
   "version": "1.0.0",
-  "description": "Card game in NodeJS by Khicken",
+  "description": "Some game in NodeJS by Khicken",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node app.js"
   },
   "repository": {
     "type": "git",

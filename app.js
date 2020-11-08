@@ -1,21 +1,21 @@
 var express = require('express');
 var app = express();
-
 var server = require('http').createServer(app);
 
-app.get('/',function(req, res) {
+app.get('/', (req, res) => {
 	res.sendFile(__dirname + '/client/index.html');
 });
 app.use('/client', express.static(__dirname + '/client'));
 
 console.log("Server started successfully");
 
+SOCKET_LIST = {};
 var io = require('socket.io')(server);
 io.sockets.on('connection', (socket) => {
     console.log("New user found!");
     var socketId = Math.random();
-    console.log("Socket Id of new user created: " + socketId);
     SOCKET_LIST[socketId] = socket;
+    console.log("Socket Id of new user created: " + socket.id);
 
     socket.on('sendMsgToServer', (data) => { // message listener
         console.log("Someone sent a message");
@@ -29,5 +29,10 @@ io.sockets.on('connection', (socket) => {
         delete SOCKET_LIST[socket.id];
     });
 });
- 
-server.listen(1939);
+
+let port = process.env.PORT;
+if(port == null || port == " ") { // called if port uninitialized
+    port = 8000;
+}
+server.listen(port); // use port established by vps
+console.log("Successfully binded to port: " + port);
