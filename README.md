@@ -1,4 +1,5 @@
-# card-game
-node js app
+# Bash, Bonk, Boop
+Multiplayer game by NodeJS
+Work in progress
 
-(work in progess)
+I like JavaScript so why not do this
