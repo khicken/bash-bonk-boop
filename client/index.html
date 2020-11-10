@@ -9,17 +9,21 @@
     <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
+    <script>
+
+    </script><script src="/index.js"></script>
+
     <ul class="pages">
-    <li class="page chat">
+    <li class="chat page">
         <div class="chatArea">
             <ul class="messages"></ul>
         </div>
         <input class="inputMessage" placeholder="Type in a message!"/>
     </li>
-    <li class="page lobby">
-        <div id="roomList"></div>
+    <li class="lobby page">
+        <div id="rooms"></div>
     </li>
-    <li class="page login">
+    <li class="login page">
         <div class="form">
           <h3 class="title">Enter your username:</h3>
           <div id="errorMessage"></div>
@@ -28,7 +32,6 @@
     </li>
     </ul>
 
-    <script src="/rooms.js"></script>
-    <script src="/index.js"></script>
+    
 </body>
 </html>

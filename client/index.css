@@ -70,6 +70,10 @@ ul {
     display: none;
 }
 
+.lobby.page {
+    background-color: rgb(58, 193, 255);
+}
+
 .messages {
     font-size: 150%;
 }

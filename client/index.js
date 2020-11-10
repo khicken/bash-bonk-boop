@@ -1,3 +1,19 @@
+var username;
+var room = 'login';
+var connected = false;
+var typing = false;
+var lastTypingTime;
+
+var socket = io();
+
+var joinRoom = (room) => {
+    socket.emit('user join', room);
+}
+
+var leaveRoom = () => {
+    socket.emit('user leave');
+}
+
 $(function () {
 // global variables
 const FADE_TIME = 250; // in ms
@@ -16,27 +32,20 @@ var $inputMessage = $('.inputMessage');
 
 var $loginPage = $('.login.page');
 var $chatPage = $('.chat.page');
+var $lobbyPage = $('.lobby.page');
 
-var username;
-var room = 'login';
-var connected = false;
-var typing = false;
-var lastTypingTime;
 var $currentInput = $usernameInput.focus();
-
-var socket = io();
 
 /************************ FUNCTIONS ************************/
 const cleanInput = (input) => { // custom text formatter to add a message to the html
     return $('<div/>').text(input).html();
 }
 
-const joinRoom = (room) => {
-    socket.emit('user join', room);
-}
-
-const leaveRoom = () => {
-    socket.emit('user leave');
+const verifyUsername = (name) => {
+    $.each(socket.emit('get users'), (key, value) => {
+        if(value == name) return false; // if username already exists, reject it
+    });
+    return true;
 }
 
 const addParticipantsMessage = (data) => { // message notifying how many members in room
@@ -51,12 +60,11 @@ const addParticipantsMessage = (data) => { // message notifying how many members
 
 const setUsername = () => { // set client's username
     username = cleanInput($usernameInput.val().trim());
-
+    
     if(verifyUsername(username)) { // if valid username, get rid of login page
         $loginPage.fadeOut();
-        $chatPage.show();
+        $lobbyPage.show();
         $loginPage.off('click');
-        $currentInput = $inputMessage.focus();
 
         socket.emit('add user', username); // add user to server, taking them to lobby
     }
@@ -176,7 +184,7 @@ $window.keydown(event => { // focusing and checking key pressed
         $currentInput.focus();
 
     if(event.which === 13) { // enter key pressed
-        if(room != 'lobby') {
+        if(room != 'lobby' && room != 'login') {
             sendMessage();
             socket.emit('stop typing');
             typing = false;
@@ -204,18 +212,18 @@ socket.on('invalid username', (data) => { // if username is invalid
 });
 
 socket.on('login', (data) => { // after login page
+    $lobbyPage.fadeOut();
+    $chatPage.show();
+    $lobbyPage.off('click');
     connected = true;
-    log(`Hi! Welcome to Room ${data.room}`, { prepend: true }); // will have to add rooms later
+    log(`Hi! Welcome to Room ${data.room}`, { prepend: true });
     addParticipantsMessage(data);
 });
 
-socket.on('updaterooms', function(rooms, currentRoom) { // updates client's room list, on lobby page (going to have to work on later)
+socket.on('update rooms', (data) => { // updates client's room list, on lobby page (going to have to work on later)
     $('#rooms').empty();
-    $.each(rooms, function(key, value) {
-        if(value == currentRoom)
-            $('#rooms').append('<div>' + value + '</div>');
-        else
-            $('#rooms').append('<div><a href="#" onclick="joinRoom(\''+ value + '\')">' + value + '</a></div>');
+    $.each(data.rooms, function(key, value) {
+        $('#rooms').append(`<div><a href="#" onclick="joinRoom('${value}')">${value}</a></div>`);
     });
 });
 
@@ -223,7 +231,8 @@ socket.on('new message', (data) => { // new message
     addChatMessage(data);
 });
 
-socket.on('user joined', (data) => { // log somebody joining the room
+socket.on('user joined', (data) => { // called when somebody joins a room
+    console.log('hey');
     log(data.username + ' has joined the room.');
     addParticipantsMessage(data);
 });
