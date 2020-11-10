@@ -12,7 +12,16 @@ server.listen(port, () => {
 app.use(express.static(path.join(__dirname, 'client')));
 
 var numUsers = 0;
+var usernames = {};
 var rooms = ['Room 001', 'Room 002', 'Room 003'];
+
+var verifyUsername = (name) => {
+    $.each(usernames, (key, value) => {
+        if(value == name)
+            return false;
+    });
+    return true;
+}
 
 io.on('connection', (socket) => {
     var addedUser = false;
@@ -24,18 +33,40 @@ io.on('connection', (socket) => {
         });
     });
 
-    socket.on('add user', (username) => {
+    socket.on('system message', (type) => { // broadcast a system message to client's room, pass in type of message
+        socket.broadcast.to(socket.room).emit(type)
+    });
+
+    socket.on('add user', (username) => { // only called when user isn't in database
         if(addedUser) return;
 
         socket.username = username;
+        socket.room = 'lobby';
+        usernames[username] = username;
         numUsers++;
         addedUser = true;
-        socket.emit('login', {
-            numUsers: numUsers
-        });
-        socket.broadcast.emit('user joined', {
+        socket.join('lobby');
+    });
+
+    socket.on('user leave', () => {
+		socket.leave(socket.room); // leave room, stored in session
+		socket.join('lobby'); // joins lobby room
+		socket.broadcast.to(socket.room).emit('updatechat', 'SERVER', socket.username + ' has left.');
+		socket.room = newroom;
+		socket.emit('updaterooms', rooms, newroom);
+    });
+
+    socket.on('user join', (newroom) => {
+		socket.join(newroom);
+		socket.emit('updatechat', 'SERVER', 'you have connected to '+ newroom);
+		socket.room = newroom;
+		socket.broadcast.to(newroom).emit('user joined', {
             username: socket.username,
             numUsers: numUsers
+        });
+        socket.emit('login', {
+            numUsers: numUsers,
+            room: socket.room
         });
     });
 
@@ -51,9 +82,10 @@ io.on('connection', (socket) => {
         });
     });
 
-    socket.on('disconnect', () => {
+    socket.on('disconnect', () => { // when user exits tab
         if(addedUser) {
             numUsers--;
+            delete usernames[socket.username];
 
             socket.broadcast.emit('user left', {
                 username: socket.username,
