@@ -12,6 +12,8 @@ server.listen(port, () => {
 app.use(express.static(path.join(__dirname, 'client')));
 
 var numUsers = 0;
+var rooms = ['Room 001', 'Room 002', 'Room 003'];
+
 io.on('connection', (socket) => {
     var addedUser = false;
 
