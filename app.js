@@ -18,19 +18,15 @@ var rooms = ['Room 001', 'Room 002', 'Room 003'];
 io.on('connection', (socket) => {
     var addedUser = false;
 
-    socket.on('get users', () => {
-        return usernames;
-    });
-
     socket.on('new message', (data) => {
-        if(socket.room != 'lobby' && socket.room != 'login') return;
+        if(socket.room == 'lobby' || socket.room == 'login') return;
         socket.broadcast.to(socket.room).emit('new message', {
             username: socket.username,
             message: data
         });
     });
 
-    socket.on('add user', (username) => { // only called when user isn't in database
+    socket.on('add user', (username) => { // only called when user isn't in database (adding user to database)
         if(addedUser) return;
 
         socket.username = username;
@@ -39,20 +35,12 @@ io.on('connection', (socket) => {
         numUsers++;
         addedUser = true;
         socket.join('lobby');
+        socket.emit('update userlist', {
+            usernames: usernames
+        });
         socket.emit('update rooms', {
             rooms: rooms
         });
-    });
-
-    socket.on('user leave', () => {
-		socket.leave(socket.room); // leave room, stored in session
-        socket.join('lobby'); // joins lobby room
-        socket.broadcast.to(socket.room).emit('user joined', {
-            username: socket.username,
-            numUsers: numUsers
-        });
-		socket.room = newroom;
-        socket.emit('updaterooms', rooms, newroom);
     });
 
     socket.on('user join', (newroom) => {
@@ -67,6 +55,20 @@ io.on('connection', (socket) => {
             numUsers: numUsers,
             room: socket.room
         });
+    });
+
+    socket.on('user leave', () => {
+		socket.leave(socket.room); // leave room, stored in session
+        socket.join('lobby'); // joins lobby room
+        socket.broadcast.to(socket.room).emit('user joined', {
+            username: socket.username,
+            numUsers: numUsers
+        });
+		socket.room = newroom;
+        socket.emit('update rooms', {
+            rooms: rooms
+        });
+        socket.emit('logout');
     });
 
     socket.on('typing', () => {
@@ -89,6 +91,10 @@ io.on('connection', (socket) => {
             socket.broadcast.emit('user left', {
                 username: socket.username,
                 numUsers: numUsers
+            });
+
+            socket.emit('update userlist', {
+                usernames: usernames
             });
         }
     });
