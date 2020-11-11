@@ -93,23 +93,23 @@ const log = (message, options) => { // add system message to chat
 }
 
 const addChatMessage = (data, options) => { // add chat message to the message list
-    var $typingMessages = getTypingMessages(data);
+    let $typingMessages = getTypingMessages(data);
     options = options || {};
     if($typingMessages.length !== 0) {
         options.fade = false;
         $typingMessages.remove();
     }
 
-    var typingUserNameClass = data.typing ? 'typing-username' : '';
-    var $usernameDiv = $('<span class="username"/>')
+    let typingUserNameClass = data.typing ? 'typing-username' : '';
+    let $usernameDiv = $('<span class="username"/>')
         .text(data.username + " ")
         .css('color', getUsernameColor(data.username))
         .addClass(typingUserNameClass);
-    var $messageBodyDiv = $('<span class="messageBody">')
+    let $messageBodyDiv = $('<span class="messageBody">')
         .text(data.message);
 
-    var typingClass = data.typing ? 'typing' : '';
-    var $messageDiv = $('<li class="message"/>')
+    let typingClass = data.typing ? 'typing' : '';
+    let $messageDiv = $('<li class="message"/>')
         .data('username', data.username)
         .css('color', 'white')
         .addClass(typingClass)

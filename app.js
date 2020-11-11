@@ -13,7 +13,7 @@ app.use(express.static(path.join(__dirname, 'client')));
 
 var numUsers = 0;
 var usernames = {};
-var rooms = ['Room 001', 'Room 002', 'Room 003'];
+var rooms = [room("Best Room", "bonk", 8), room("Another one", "boop", 69)];
 
 io.on('connection', (socket) => {
     var addedUser = false;
