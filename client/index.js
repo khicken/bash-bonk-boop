@@ -15,6 +15,10 @@ var leaveRoom = () => {
     socket.emit('user leave');
 }
 
+var createRoom = (data) => {
+
+}
+
 $(function () {
 // global variables
 const FADE_TIME = 250; // in ms
@@ -239,7 +243,7 @@ socket.on('update userlist', (data) => { // this is called when there is a new u
 socket.on('update rooms', (data) => { // updates client's room list,
     $('#rooms').empty();
     $.each(data.rooms, function(key, value) {
-        $('#rooms').append(`<div class="room-item"><a href="#" onclick="joinRoom('${value}')">${value}</a></div>`);
+        $('#rooms').append(`<div class="room-item"><a href="#" onclick="joinRoom('${value.name}')">${value.name}</a></div>`);
     });
 });
 

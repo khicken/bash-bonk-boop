@@ -3,6 +3,7 @@ var app = express();
 var path = require('path');
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
+var roomObject = require('./rooms');
 
 var port = process.env.PORT || 3000;
 server.listen(port, () => {
@@ -13,8 +14,8 @@ app.use(express.static(path.join(__dirname, 'client')));
 
 var numUsers = 0;
 var usernames = {};
-var rooms = [room("Best Room", "bonk", 8), room("Another one", "boop", 69)];
-
+var rooms = [roomObject.room("Best Room", "bonk", 8), roomObject.room("Another one", "boop", 69)];
+// MAKE ROOM THING WORKK AHHH
 io.on('connection', (socket) => {
     var addedUser = false;
 
