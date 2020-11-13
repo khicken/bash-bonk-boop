@@ -1,6 +1,6 @@
 {
   "name": "bash-bonk-boop",
-  "version": "1.0.0",
+  "version": "0.0.4",
   "description": "Some game in NodeJS by Khicken",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "\u001b[A\u001b[B"
+    "url": "https://github.com/khicken/bash-bonk-boop.git"
   },
   "author": "Khicken",
   "license": "ISC",
