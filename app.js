@@ -14,7 +14,7 @@ app.use(express.static(path.join(__dirname, 'client')));
 
 var usernames = {};
 var rooms = {
-    "Eeee": new roomObject.room("Eeee", "", 10000),
+    "Eeee": new roomObject.room("Eeee", "none", 2),
     "Best Room": new roomObject.room("Best Room", "bonk", 8),
     "Another one": new roomObject.room("Another one", "boop", 69)
 };
@@ -22,6 +22,12 @@ var rooms = {
 // note: socket.room refers to room name, not room object
 io.on('connection', (socket) => {
     var addedUser = false;
+
+    socket.on('update rooms', () => { // literally just updates rooms
+        socket.emit('update rooms', {
+            rooms: rooms
+        });
+    });
 
     socket.on('new message', (data) => {
         if(socket.room == '^lobby' || socket.room == '^login') return;

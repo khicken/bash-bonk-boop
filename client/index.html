@@ -22,7 +22,11 @@
     </li>
     <li class="lobby page">
         <h1 style="text-align: center; margin-top: 2%;">Join a room!</h1>
-        <div class="room-container" id="rooms"></div>
+        <div class="room-container">
+            <div id="rooms"></div>
+            <div style="clear: both;"></div>
+            <button onclick="updateRoomList()">Refresh</button>
+        </div>
     </li>
     <li class="login page">
         <div class="form">

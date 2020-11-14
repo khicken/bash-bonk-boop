@@ -6,3 +6,4 @@ Changelog:
 - 11/10 (0.0.2): Added usernames, improved ui based on socket.io chat
 - 11/11 (0.0.3): Added different connections (rooms), improved ui, created room screen
 - 11/12 (0.0.4): Bug fixes, setup room objects (for size, name, passwords, creation), updated domains + ssl certificate
+- 11/14 (0.0.5): Fixed member bug, added room max, working on new ui, starting game creation

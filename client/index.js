@@ -15,6 +15,10 @@ var leaveRoom = () => {
     socket.emit('user leave');
 }
 
+var updateRoomList = () => {
+    socket.emit('update rooms');
+}
+
 var createRoom = (data) => {
     // only alphanumeric with !^&*(),.?_- allowed
 }
@@ -242,7 +246,12 @@ socket.on('update userlist', (data) => { // this is called when there is a new u
 socket.on('update rooms', (data) => { // updates client's room list,
     $('#rooms').empty();
     $.each(data.rooms, function(key, value) {
-        $('#rooms').append(`<div class="room-item"><a href="#" onclick="joinRoom('${value.name}')">${key} ${value.currentSize} / ${value.maxSize}</a></div>`);
+        $('#rooms').append(`
+            <a class="room-item" href="#" onclick="joinRoom('${value.name}')">
+                <p class="left-side">${key}</p>
+                <p class="right-side">${value.currentSize} / ${value.maxSize}</p>
+            </a>
+        `);
     });
 });
 
