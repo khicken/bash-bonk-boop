@@ -1,6 +1,30 @@
 var roomIndex = 1;
 var roomList = [];
 
+/**
+ * Returns a new array without the element given
+ * @param {array} ary Array to be iterated through
+ * @param {element} e Element that would like to be removed
+ */
+function removeFromArray(ary, e) {
+    let out = [];
+    for(let i = 0; i < ary.length; i++) {
+        if(ary[i] != e) out.push(i);
+    }
+    return out;
+}
+
+/**
+ * Checks if element is in array
+ * @param {array} ary Array to be iterated through
+ * @param {element} e Element that would like to be checked
+ */
+function checkInArray(ary, e) {
+    for(let i = 0; i < ary.length; i++)
+        if(ary[i] == e) return true;
+    return false;
+}
+
 function generateID(len) {
     var out = '';
     var ref = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -16,43 +40,27 @@ function generateID(len) {
  * @param {number} maxSize Maximum amount of people n the room (default is 10)
  */
 module.exports = {
-    room: function(name, password, maxSize) {
-        var Name = name || 'Room ' + roomIndex.toString();
-        var Password = password || generateID(8);
-        var Id = generateID(10);
-        var MaxSize = maxSize || 10;
-        var CurrentSize = 0;
-        var canJoin = true;
-        var users = [];
+room: function(name, password, maxSize) {
+    this.name = name || 'Room ' + roomIndex.toString();
+    this.password = password || generateID(8);
+    this.id = generateID(10);
+    this.maxSize = maxSize || 10;
+    this.currentSize = 0;
 
-        return {
-            id: Id,
-            name: Name,
-            password: Password,
-            maxSize: MaxSize,
-            currentSize: CurrentSize,
-            canJoin: true,
-            /**
-             * @returns {boolean} If the user can join, is true. Else, will return false
-             */
-            addPlayer(username) {
-                if(MaxSize < users) {
-                    users.push(username);
-                    CurrentSize++;
-                    return true;
-                }
-                return false;
-            },
-            /**
-             * @returns {boolean} Once the user has been removed
-             */
-            removePlayer(username) {
-                users = users.filter((v) => {
-                    return v != username;
-                }); // redefine array of elements of all elements other than the username
-                CurrentSize--;
-                return true;
-            }
+    let users = [];
+
+    this.addPlayer = function(username) {
+        if(this.currentSize < this.maxSize && !checkInArray(username)) {
+            users.push(username);
+            this.currentSize++;
+            return true;
         }
-    }
+        return false;
+    };
+
+    this.removePlayer = function(username) {
+        users = removeFromArray(users, username);
+        this.currentSize--;
+    };
+}
 }

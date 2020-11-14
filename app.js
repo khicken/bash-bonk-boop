@@ -12,30 +12,33 @@ server.listen(port, () => {
 
 app.use(express.static(path.join(__dirname, 'client')));
 
-var numUsers = 0;
 var usernames = {};
-var rooms = [roomObject.room("Best Room", "bonk", 8), roomObject.room("Another one", "boop", 69)];
-// MAKE ROOM THING WORKK AHHH
+var rooms = {
+    "Eeee": new roomObject.room("Eeee", "", 10000),
+    "Best Room": new roomObject.room("Best Room", "bonk", 8),
+    "Another one": new roomObject.room("Another one", "boop", 69)
+};
+
+// note: socket.room refers to room name, not room object
 io.on('connection', (socket) => {
     var addedUser = false;
 
     socket.on('new message', (data) => {
-        if(socket.room == 'lobby' || socket.room == 'login') return;
+        if(socket.room == '^lobby' || socket.room == '^login') return;
         socket.broadcast.to(socket.room).emit('new message', {
             username: socket.username,
             message: data
         });
     });
 
-    socket.on('add user', (username) => { // only called when user isn't in database (adding user to database)
+    socket.on('new user', (username) => { // only called when user isn't in database (adding user to database)
         if(addedUser) return;
 
         socket.username = username;
-        socket.room = 'lobby';
+        socket.room = '^lobby';
         usernames[username] = username;
-        numUsers++;
         addedUser = true;
-        socket.join('lobby');
+        socket.join('^lobby');
         socket.emit('update userlist', {
             usernames: usernames
         });
@@ -44,26 +47,29 @@ io.on('connection', (socket) => {
         });
     });
 
-    socket.on('user join', (newroom) => {
+    socket.on('user join', (newroom) => { // newroom is a string
+        if(!rooms[newroom].addPlayer(socket.username)) return; // if they can't be added, rip
+
         socket.leave(socket.room);
 		socket.join(newroom);
         socket.room = newroom;
 		socket.broadcast.to(newroom).emit('user joined', {
             username: socket.username,
-            numUsers: numUsers
+            room: rooms[newroom]
         });
         socket.emit('login', {
-            numUsers: numUsers,
-            room: socket.room
+            room: rooms[newroom]
         });
     });
 
     socket.on('user leave', () => {
+        rooms[socket.room].removePlayer(socket.username);
+
 		socket.leave(socket.room); // leave room, stored in session
-        socket.join('lobby'); // joins lobby room
-        socket.broadcast.to(socket.room).emit('user joined', {
+        socket.join('^lobby'); // joins lobby room
+        socket.broadcast.to(socket.room).emit('user left', {
             username: socket.username,
-            numUsers: numUsers
+            room: rooms[socket.room]
         });
 		socket.room = newroom;
         socket.emit('update rooms', {
@@ -86,12 +92,12 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', () => { // when user exits tab
         if(addedUser) {
-            numUsers--;
             delete usernames[socket.username];
+            rooms[socket.room].removePlayer(socket.username);
 
             socket.broadcast.emit('user left', {
                 username: socket.username,
-                numUsers: numUsers
+                room: rooms[socket.room]
             });
 
             socket.emit('update userlist', {

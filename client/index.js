@@ -1,6 +1,6 @@
 var username;
 var usernames = {};
-var currentRoom = 'login';
+var currentRoom = '^login'; // NOT a room object, a string // ^ indicates non user-created room
 var connected = false;
 var typing = false;
 var lastTypingTime;
@@ -16,11 +16,10 @@ var leaveRoom = () => {
 }
 
 var createRoom = (data) => {
-
+    // only alphanumeric with !^&*(),.?_- allowed
 }
 
-$(function () {
-// global variables
+$(function() {
 const FADE_TIME = 250; // in ms
 const TYPING_TIMER_LENGTH = 750; // in ms
 const COLORS = [
@@ -55,10 +54,10 @@ const verifyUsername = (name) => {
 
 const addParticipantsMessage = (data) => { // message notifying how many members in room
     var message = '';
-    if(data.numUsers === 1)
+    if(data.room.currentSize === 1)
         message += "There is 1 member in the room.";
     else
-        message += `There are ${data.numUsers} members in the room.`;
+        message += `There are ${data.room.currentSize} members in the room.`;
     
     log(message);
 }
@@ -70,9 +69,9 @@ const setUsername = () => { // set client's username
         $loginPage.fadeOut();
         $lobbyPage.show();
         $loginPage.off('click');
-        currentRoom = 'lobby';
+        currentRoom = '^lobby';
 
-        socket.emit('add user', username); // add user to server, taking them to lobby
+        socket.emit('new user', username); // add user to server, taking them to lobby
     }
 }
 
@@ -191,7 +190,7 @@ $window.keydown(event => { // focusing and checking key pressed
 
     if(event.which === 13) { // enter key pressed
         console.log(currentRoom);
-        if(currentRoom != 'lobby' && currentRoom != 'login') {
+        if(currentRoom != '^lobby' && currentRoom != '^login') {
             sendMessage();
             socket.emit('stop typing');
             typing = false;
@@ -223,17 +222,17 @@ socket.on('login', (data) => { // called after initial join room process
     $chatPage.show();
     $lobbyPage.off('click');
     connected = true;
-    currentRoom = data.room;
-    log(`You have joined ${data.room}.`, { prepend: true });
+    currentRoom = data.room.name;
+    log(`You have joined ${data.room.name}.`, { prepend: true });
     addParticipantsMessage(data);
 });
 
-socket.on('logout', () => { // called after initial join room process
+socket.on('logout', () => { // called after initial leave room process
     $lobbyPage.fadeOut();
     $chatPage.show();
     $lobbyPage.off('click');
     connected = false;
-    currentRoom = 'lobby';
+    currentRoom = '^lobby';
 });
 
 socket.on('update userlist', (data) => { // this is called when there is a new user/user is deleted
@@ -243,7 +242,7 @@ socket.on('update userlist', (data) => { // this is called when there is a new u
 socket.on('update rooms', (data) => { // updates client's room list,
     $('#rooms').empty();
     $.each(data.rooms, function(key, value) {
-        $('#rooms').append(`<div class="room-item"><a href="#" onclick="joinRoom('${value.name}')">${value.name}</a></div>`);
+        $('#rooms').append(`<div class="room-item"><a href="#" onclick="joinRoom('${value.name}')">${key} ${value.currentSize} / ${value.maxSize}</a></div>`);
     });
 });
 
@@ -277,7 +276,7 @@ socket.on('disconnect', () => { // if someone has disconnected, tell them
 socket.on('reconnect', () => { // if someone has reconnected, tell them
     log('You have been reconnected to the room.');
     if(username)
-        socket.emit('add user', {username});
+        socket.emit('new user', {username});
 });
 
 socket.on('reconnect_error', () => {
