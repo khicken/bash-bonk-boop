@@ -12,7 +12,7 @@ server.listen(port, () => {
 
 app.use(express.static(path.join(__dirname, 'client')));
 
-var usernames = {};
+var usernames = {}; // going to change layout later
 var rooms = {
     "Eeee": new roomObject.room("Eeee", "none", 2),
     "Best Room": new roomObject.room("Best Room", "bonk", 8),
