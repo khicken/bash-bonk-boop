@@ -172,3 +172,10 @@ ul {
 .right-side {
     float: right;
 }
+
+#gameCanvas {
+    border: none;
+    text-align: center;
+    width: 70%;
+    height: 50%;
+}

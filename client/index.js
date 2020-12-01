@@ -39,7 +39,7 @@ var $messages = $('.messages');
 var $inputMessage = $('.inputMessage');
 
 var $loginPage = $('.login.page');
-var $chatPage = $('.chat.page');
+var $roomPage = $('.room.page');
 var $lobbyPage = $('.lobby.page');
 
 var $currentInput = $usernameInput.focus();
@@ -223,7 +223,7 @@ socket.on('invalid username', (data) => { // if username is invalid
 
 socket.on('login', (data) => { // called after initial join room process
     $lobbyPage.fadeOut();
-    $chatPage.show();
+    $roomPage.show();
     $lobbyPage.off('click');
     connected = true;
     currentRoom = data.room.name;
@@ -233,7 +233,7 @@ socket.on('login', (data) => { // called after initial join room process
 
 socket.on('logout', () => { // called after initial leave room process
     $lobbyPage.fadeOut();
-    $chatPage.show();
+    $roomPage.show();
     $lobbyPage.off('click');
     connected = false;
     currentRoom = '^lobby';
