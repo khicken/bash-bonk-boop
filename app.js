@@ -5,14 +5,14 @@ var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var roomObject = require('./rooms');
 
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || 3000; //
 server.listen(port, () => {
     console.log(`Server successfully running at port ${port}`);
 });
 
 app.use(express.static(path.join(__dirname, 'client')));
 
-var usernames = {};
+var usernames = {}; // going to change layout later
 var rooms = {
     "Eeee": new roomObject.room("Eeee", "none", 2),
     "Best Room": new roomObject.room("Best Room", "bonk", 8),
